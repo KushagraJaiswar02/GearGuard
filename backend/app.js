@@ -10,7 +10,14 @@ app.use(cors());
 app.use(express.json());
 
 const equipmentRoutes = require('./routes/equipmentRoutes');
+const authRoutes = require('./routes/authRoutes');
+const maintenanceRequestRoutes = require('./routes/maintenanceRequestRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+
 app.use('/api/equipment', equipmentRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/requests', maintenanceRequestRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // Export for testing
 module.exports = app;

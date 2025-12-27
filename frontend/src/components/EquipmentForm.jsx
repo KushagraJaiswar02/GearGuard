@@ -159,6 +159,14 @@ const EquipmentForm = () => {
                             <input type="date" name="purchase_date" value={formData.purchase_date ? formData.purchase_date.split('T')[0] : ''} onChange={handleChange} disabled={isScrapped} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
                         </div>
                         <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Criticality</label>
+                            <select name="criticality" value={formData.criticality || 'Normal'} onChange={handleChange} disabled={isScrapped} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                                <option value="Critical">Critical (High Priority)</option>
+                                <option value="Important">Important</option>
+                                <option value="Normal">Normal</option>
+                            </select>
+                        </div>
+                        <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Maintenance Policy</label>
                             <select name="maintenance_type" value={formData.maintenance_type || 'Preventive'} onChange={handleChange} disabled={isScrapped} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
                                 <option value="Preventive">Preventive (Scheduled)</option>

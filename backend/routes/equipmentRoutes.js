@@ -1,22 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const equipmentController = require('../controllers/equipmentController');
+const authMiddleware = require('../middleware/authMiddleware');
+const roleMiddleware = require('../middleware/roleMiddleware');
 
-// Search/List
-router.get('/', equipmentController.getAllEquipment);
-router.post('/', equipmentController.createEquipment);
+// Public or Authenticated generic routes
+router.get('/', authMiddleware, equipmentController.getAllEquipment);
+router.get('/:id/details', authMiddleware, equipmentController.getEquipmentDetails);
+router.get('/:id/maintenance-badge', authMiddleware, equipmentController.getMaintenanceBadge);
 
-// Details (Auto-fill)
-router.get('/:id/details', equipmentController.getEquipmentDetails);
-
-// Smart Button
-router.get('/:id/maintenance-badge', equipmentController.getMaintenanceBadge);
+// Admin / Manager Only
+router.post('/', authMiddleware, roleMiddleware(['Admin', 'Manager']), equipmentController.createEquipment);
+router.put('/:id', authMiddleware, roleMiddleware(['Admin', 'Manager']), equipmentController.updateEquipment);
 
 // Scrap Logic
-// Scrap Logic
-router.patch('/:id/scrap', equipmentController.scrapEquipment);
+// Propose Scrap: Technician, Manager
+router.post('/:id/scrap-propose', authMiddleware, roleMiddleware(['Technician', 'Manager']), equipmentController.proposeScrap);
 
-// General Update
-router.put('/:id', equipmentController.updateEquipment);
+// Approve Scrap: Manager, Admin
+router.post('/:id/scrap-approve', authMiddleware, roleMiddleware(['Admin', 'Manager']), equipmentController.approveScrap);
 
 module.exports = router;

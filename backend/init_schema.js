@@ -3,19 +3,27 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    multipleStatements: true
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  multipleStatements: true
 });
 
 const sql = `
+DROP TABLE IF EXISTS maintenance_requests;
+DROP TABLE IF EXISTS equipment;
+DROP TABLE IF EXISTS maintenance_team_members;
+DROP TABLE IF EXISTS maintenance_teams;
+DROP TABLE IF EXISTS users;
+
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   email VARCHAR(255) UNIQUE,
-  role VARCHAR(50) DEFAULT 'employee'
+  password VARCHAR(255) NOT NULL,
+  role VARCHAR(50) DEFAULT 'User',
+  department VARCHAR(100)
 );
 
 CREATE TABLE IF NOT EXISTS maintenance_teams (
@@ -45,6 +53,7 @@ CREATE TABLE IF NOT EXISTS equipment (
   maintenance_team_id INT,
   technician_id INT,
   status VARCHAR(50) DEFAULT 'Active',
+  criticality ENUM('Critical', 'Important', 'Normal') DEFAULT 'Normal',
   FOREIGN KEY (employee_id) REFERENCES users(id) ON DELETE SET NULL,
   FOREIGN KEY (maintenance_team_id) REFERENCES maintenance_teams(id) ON DELETE SET NULL,
   FOREIGN KEY (technician_id) REFERENCES users(id) ON DELETE SET NULL
@@ -54,17 +63,18 @@ CREATE TABLE IF NOT EXISTS maintenance_requests (
   id INT AUTO_INCREMENT PRIMARY KEY,
   equipment_id INT NOT NULL,
   status VARCHAR(50) DEFAULT 'New',
+  priority ENUM('Low', 'Medium', 'High') DEFAULT 'Low',
   description TEXT,
   FOREIGN KEY (equipment_id) REFERENCES equipment(id) ON DELETE CASCADE
 );
 `;
 
 db.connect((err) => {
+  if (err) throw err;
+  console.log('Connected to DB for Schema Init');
+  db.query(sql, (err, result) => {
     if (err) throw err;
-    console.log('Connected to DB for Schema Init');
-    db.query(sql, (err, result) => {
-        if (err) throw err;
-        console.log('Tables created successfully');
-        process.exit();
-    });
+    console.log('Tables created successfully');
+    process.exit();
+  });
 });
