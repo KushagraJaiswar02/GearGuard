@@ -20,4 +20,7 @@ router.post('/:id/scrap-propose', authMiddleware, roleMiddleware(['Technician', 
 // Approve Scrap: Manager, Admin
 router.post('/:id/scrap-approve', authMiddleware, roleMiddleware(['Admin', 'Manager']), equipmentController.approveScrap);
 
+// Kill Switch (Scrap + Close): Manager Only
+router.post('/:requestId/scrap-kill-switch', authMiddleware, roleMiddleware(['Manager', 'Admin']), equipmentController.scrapAndCloseRequest);
+
 module.exports = router;

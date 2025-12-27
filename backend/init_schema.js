@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS maintenance_teams (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
+  department VARCHAR(100),
   description TEXT
 );
 
@@ -54,6 +55,7 @@ CREATE TABLE IF NOT EXISTS equipment (
   technician_id INT,
   status VARCHAR(50) DEFAULT 'Active',
   criticality ENUM('Critical', 'Important', 'Normal') DEFAULT 'Normal',
+  last_service_date DATETIME,
   FOREIGN KEY (employee_id) REFERENCES users(id) ON DELETE SET NULL,
   FOREIGN KEY (maintenance_team_id) REFERENCES maintenance_teams(id) ON DELETE SET NULL,
   FOREIGN KEY (technician_id) REFERENCES users(id) ON DELETE SET NULL
@@ -62,10 +64,17 @@ CREATE TABLE IF NOT EXISTS equipment (
 CREATE TABLE IF NOT EXISTS maintenance_requests (
   id INT AUTO_INCREMENT PRIMARY KEY,
   equipment_id INT NOT NULL,
+  technician_id INT,
   status VARCHAR(50) DEFAULT 'New',
   priority ENUM('Low', 'Medium', 'High') DEFAULT 'Low',
   description TEXT,
-  FOREIGN KEY (equipment_id) REFERENCES equipment(id) ON DELETE CASCADE
+  hours_spent FLOAT DEFAULT 0,
+  parts_used TEXT,
+  completion_notes TEXT,
+  completed_at DATETIME,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (equipment_id) REFERENCES equipment(id) ON DELETE CASCADE,
+  FOREIGN KEY (technician_id) REFERENCES users(id) ON DELETE SET NULL
 );
 `;
 

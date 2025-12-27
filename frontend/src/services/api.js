@@ -62,14 +62,32 @@ export const api = {
             const response = await axiosInstance.post('/requests', data);
             return response.data;
         },
-        updateStatus: async (id, status) => {
-            const response = await axiosInstance.patch(`/requests/${id}/status`, { status });
+        updateStatus: async (id, status, logs = {}) => {
+            const response = await axiosInstance.patch(`/requests/${id}/status`, { status, ...logs });
             return response.data;
         }
     },
     dashboard: {
         getStats: async () => {
             const response = await axiosInstance.get('/dashboard/manager-stats');
+            return response.data;
+        }
+    },
+    teams: {
+        getAll: async () => {
+            const response = await axiosInstance.get('/teams');
+            return response.data;
+        },
+        getTechnicians: async () => {
+            const response = await axiosInstance.get('/teams/technicians');
+            return response.data;
+        },
+        create: async (data) => {
+            const response = await axiosInstance.post('/teams', data);
+            return response.data;
+        },
+        assignMember: async (teamId, userId, action) => {
+            const response = await axiosInstance.patch(`/teams/${teamId}/assign`, { userId, action });
             return response.data;
         }
     }
