@@ -1,82 +1,99 @@
-const mysql = require('mysql2');
-const dotenv = require('dotenv');
-dotenv.config();
+const db = require('./config/db');
+const bcrypt = require('bcryptjs');
 
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    multipleStatements: true
-});
+const seed = async () => {
+    try {
+        console.log('--- Starting Seed ---');
 
-const seedSql = `
--- Clean up existing data to ensure clean state for demo
-SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE TABLE maintenance_requests;
-TRUNCATE TABLE equipment;
-TRUNCATE TABLE maintenance_team_members;
-TRUNCATE TABLE maintenance_teams;
-TRUNCATE TABLE users;
-SET FOREIGN_KEY_CHECKS = 1;
+        // 1. Clear Data
+        await db.query('DELETE FROM maintenance_requests');
+        await db.query('DELETE FROM equipment');
+        await db.query('DELETE FROM maintenance_team_members');
+        await db.query('DELETE FROM maintenance_teams');
+        await db.query('DELETE FROM users');
+        console.log('Data Cleared');
 
--- 1. Insert Users
-INSERT INTO users (id, name, email, role) VALUES
-(1, 'Alice Technician', 'alice@gearguard.com', 'Technician'),
-(2, 'Bob Manager', 'bob@gearguard.com', 'Manager'),
-(3, 'Charlie Operator', 'charlie@gearguard.com', 'Employee'),
-(4, 'Dave IT', 'dave@gearguard.com', 'Technician');
+        // 2. Users
+        const password = await bcrypt.hash('password123', 10);
 
--- 2. Insert Teams
-INSERT INTO maintenance_teams (id, name, description) VALUES
-(1, 'Heavy Machinery', 'Responsible for large industrial equipment'),
-(2, 'IT Support', 'Computers, Servers, and Network gear'),
-(3, 'Facilities', 'General building maintenance');
+        // Admin/Manager
+        const [mgr] = await db.query('INSERT INTO users (name, email, password, role, department) VALUES (?, ?, ?, ?, ?)',
+            ['Alice Manager', 'manager@test.com', password, 'Manager', 'Operations']);
+        const mgrId = mgr.insertId;
 
--- 3. Insert Equipment
--- Critical Asset: Main Production Server (Broken)
-INSERT INTO equipment (id, name, serial_number, category, purchase_date, warranty_expiration, location, department, employee_id, maintenance_team_id, technician_id, status, criticality, maintenance_frequency, last_service_date, next_service_date, maintenance_type) VALUES
-(1, 'Main Production Server', 'SRV-001', 'IT', '2023-01-15', '2026-01-15', 'Server Room A', 'IT', 2, 2, 4, 'Active', 'Critical', 90, '2023-10-01', '2024-01-01', 'Preventive');
+        // Technicians
+        const [tech1] = await db.query('INSERT INTO users (name, email, password, role, department) VALUES (?, ?, ?, ?, ?)',
+            ['Tom Tech (IT)', 'tech_it@test.com', password, 'Technician', 'IT']);
+        const [tech2] = await db.query('INSERT INTO users (name, email, password, role, department) VALUES (?, ?, ?, ?, ?)',
+            ['Sarah Tech (Prod)', 'tech_prod@test.com', password, 'Technician', 'Production']);
+        const [tech3] = await db.query('INSERT INTO users (name, email, password, role, department) VALUES (?, ?, ?, ?, ?)',
+            ['Mike Tech (Fac)', 'tech_fac@test.com', password, 'Technician', 'Facilities']);
 
--- Important Asset: Hydraulic Press (Faulty)
-INSERT INTO equipment (id, name, serial_number, category, purchase_date, warranty_expiration, location, department, employee_id, maintenance_team_id, technician_id, status, criticality, maintenance_frequency, last_service_date, next_service_date, maintenance_type) VALUES
-(2, 'Hydraulic Press X1', 'HP-X1-99', 'Machinery', '2020-05-20', '2022-05-20', 'Factory Floor', 'Production', 3, 1, 1, 'Active', 'Important', 180, '2023-08-15', '2024-02-15', 'Preventive');
+        // Employees
+        const [emp1] = await db.query('INSERT INTO users (name, email, password, role, department) VALUES (?, ?, ?, ?, ?)',
+            ['John Employee', 'employee@test.com', password, 'Employee', 'Production']);
 
--- Normal Asset: Coffee Machine (Active, Due Soon)
-INSERT INTO equipment (id, name, serial_number, category, purchase_date, warranty_expiration, location, department, employee_id, maintenance_team_id, technician_id, status, criticality, maintenance_frequency, last_service_date, next_service_date, maintenance_type) VALUES
-(3, 'Break Room Coffee Machine', 'CM-2024', 'Appliance', '2024-01-10', '2025-01-10', 'Break Room 2', 'Facilities', 3, 3, 1, 'Active', 'Normal', 30, '2024-02-01', DATE_ADD(CURDATE(), INTERVAL 5 DAY), 'Preventive');
+        console.log('Users Created');
 
--- Scrapped Asset
-INSERT INTO equipment (id, name, serial_number, category, purchase_date, warranty_expiration, location, department, employee_id, maintenance_team_id, technician_id, status, criticality, maintenance_frequency, last_service_date, next_service_date, maintenance_type) VALUES
-(4, 'Old Generator', 'GEN-OLD-01', 'Power', '2010-01-01', '2012-01-01', 'Basement', 'Facilities', 2, 3, 1, 'Scrapped', 'Normal', 365, '2020-01-01', '2021-01-01', 'Corrective');
+        // 3. Teams
+        const [teamIT] = await db.query('INSERT INTO maintenance_teams (name, department, description) VALUES (?, ?, ?)',
+            ['IT Rapid Response', 'IT', 'Handlers of servers and network gear.']);
+        const [teamProd] = await db.query('INSERT INTO maintenance_teams (name, department, description) VALUES (?, ?, ?)',
+            ['Heavy Machinery Squad', 'Production', 'Conveyor belts and assembly robots.']);
 
--- 4. Insert Maintenance Requests to trigger statuses
--- Trigger 'Broken' for Server (High Priority)
-INSERT INTO maintenance_requests (equipment_id, status, priority, description) VALUES
-(1, 'Open', 'High', 'Server overheating alert! Immediate checks required.');
+        // Assign Techs
+        await db.query('INSERT INTO maintenance_team_members (team_id, user_id) VALUES (?, ?)', [teamIT.insertId, tech1.insertId]);
+        await db.query('INSERT INTO maintenance_team_members (team_id, user_id) VALUES (?, ?)', [teamProd.insertId, tech2.insertId]);
 
--- Trigger 'Faulty' for Press (Medium Priority)
-INSERT INTO maintenance_requests (equipment_id, status, priority, description) VALUES
-(2, 'Open', 'Medium', 'Oil leak detected during shift change. Needs inspection.');
+        console.log('Teams & Assignments Created');
 
--- Normal Active Request (Low Priority - check if this makes it faulty? Logic said Med/Low makes it Faulty. Let's add a Low one for the Press too)
-INSERT INTO maintenance_requests (equipment_id, status, priority, description) VALUES
-(2, 'Pending', 'Low', 'Routine cleaning scheduled.');
+        // 4. Equipment
+        // IT Assets (Assigned to Team IT)
+        const [eq1] = await db.query(`INSERT INTO equipment 
+            (name, serial_number, department, maintenance_team_id, criticality, status) 
+            VALUES (?, ?, ?, ?, ?, ?)`,
+            ['Main Server Rack', 'IT-SRV-001', 'IT', teamIT.insertId, 'Critical', 'Active']);
 
-`;
+        const [eq2] = await db.query(`INSERT INTO equipment 
+            (name, serial_number, department, maintenance_team_id, criticality, status) 
+            VALUES (?, ?, ?, ?, ?, ?)`,
+            ['Office Printer A', 'IT-PRT-002', 'IT', teamIT.insertId, 'Normal', 'Faulty']);
 
-db.connect((err) => {
-    if (err) {
-        console.error('Connection failed:', err);
-        return;
-    }
-    console.log('Connected to DB for Seeding');
-    db.query(seedSql, (err, result) => {
-        if (err) {
-            console.error('Seeding failed:', err);
-        } else {
-            console.log('Database seeded successfully with demo data!');
-        }
+        // Production Assets (Assigned to Team Prod)
+        const [eq3] = await db.query(`INSERT INTO equipment 
+            (name, serial_number, department, maintenance_team_id, criticality, status) 
+            VALUES (?, ?, ?, ?, ?, ?)`,
+            ['Assembly Robot Arm', 'PROD-RBT-101', 'Production', teamProd.insertId, 'Critical', 'Active']);
+
+        // Scrapped Asset
+        const [eq4] = await db.query(`INSERT INTO equipment 
+            (name, serial_number, department, status) 
+            VALUES (?, ?, ?, ?)`,
+            ['Old Generator', 'FAC-GEN-OLD', 'Facilities', 'Pending Scrap Approval']);
+
+        console.log('Equipment Created');
+
+        // 5. Maintenance Requests
+        // Request for Server (High Priority, IT Team)
+        await db.query('INSERT INTO maintenance_requests (equipment_id, status, priority, description) VALUES (?, ?, ?, ?)',
+            [eq1.insertId, 'New', 'High', 'Server overheating alarm triggered.']);
+
+        // Request for Printer (In Progress, Assigned to Tech 1)
+        await db.query('INSERT INTO maintenance_requests (equipment_id, status, priority, description, technician_id) VALUES (?, ?, ?, ?, ?)',
+            [eq2.insertId, 'In Progress', 'Low', 'Paper jam in tray 2.', tech1.insertId]);
+
+        // Request for Robot (Critical, Prod Team)
+        await db.query('INSERT INTO maintenance_requests (equipment_id, status, priority, description) VALUES (?, ?, ?, ?)',
+            [eq3.insertId, 'New', 'High', 'Hydraulic leak detected.']);
+
+        console.log('Requests Created');
+        console.log('--- Seed Complete ---');
         process.exit();
-    });
-});
+
+    } catch (err) {
+        console.error(err);
+        process.exit(1);
+    }
+};
+
+seed();

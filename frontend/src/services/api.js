@@ -13,6 +13,8 @@ axiosInstance.interceptors.request.use(
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+        config.headers['Cache-Control'] = 'no-cache';
+        config.headers['Pragma'] = 'no-cache';
         return config;
     },
     (error) => Promise.reject(error)
@@ -51,6 +53,10 @@ export const api = {
         approveScrap: async (id, approved) => {
             const response = await axiosInstance.post(`/equipment/${id}/scrap-approve`, { approved });
             return response.data;
+        },
+        scrapKillSwitch: async (requestId) => {
+            const response = await axiosInstance.post(`/equipment/${requestId}/scrap-kill-switch`);
+            return response.data;
         }
     },
     requests: {
@@ -62,14 +68,36 @@ export const api = {
             const response = await axiosInstance.post('/requests', data);
             return response.data;
         },
-        updateStatus: async (id, status) => {
-            const response = await axiosInstance.patch(`/requests/${id}/status`, { status });
+        updateStatus: async (id, status, logs = {}) => {
+            const response = await axiosInstance.patch(`/requests/${id}/status`, { status, ...logs });
             return response.data;
         }
     },
     dashboard: {
         getStats: async () => {
             const response = await axiosInstance.get('/dashboard/manager-stats');
+            return response.data;
+        }
+    },
+    teams: {
+        getAll: async () => {
+            const response = await axiosInstance.get('/teams');
+            return response.data;
+        },
+        getTechnicians: async () => {
+            const response = await axiosInstance.get('/teams/technicians');
+            return response.data;
+        },
+        create: async (data) => {
+            const response = await axiosInstance.post('/teams', data);
+            return response.data;
+        },
+        assignMember: async (teamId, userId, action) => {
+            const response = await axiosInstance.patch(`/teams/${teamId}/assign`, { userId, action });
+            return response.data;
+        },
+        getMyTeam: async () => {
+            const response = await axiosInstance.get('/teams/mine');
             return response.data;
         }
     }

@@ -1,4 +1,5 @@
 const EquipmentModel = require('../models/EquipmentModel');
+const db = require('../config/db');
 
 exports.getAllEquipment = async (req, res) => {
     try {
@@ -99,6 +100,28 @@ exports.approveScrap = async (req, res) => {
         await EquipmentModel.updateStatus(id, newStatus);
 
         res.json({ message: `Scrap request ${approved ? 'approved' : 'rejected'}`, id, status: newStatus });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+exports.scrapAndCloseRequest = async (req, res) => {
+    try {
+        const { requestId } = req.params;
+
+        // 1. Get Request to find Equipment ID
+        const [reqs] = await db.query('SELECT equipment_id FROM maintenance_requests WHERE id = ?', [requestId]);
+        if (reqs.length === 0) return res.status(404).json({ message: 'Request not found' });
+        const equipmentId = reqs[0].equipment_id;
+
+        // 2. Perform Transaction (Simulated with sequential queries for mysql2 basic)
+        // Mark Equipment Scrapped
+        await db.query('UPDATE equipment SET status = "Scrapped" WHERE id = ?', [equipmentId]);
+
+        // Mark Request Closed
+        await db.query('UPDATE maintenance_requests SET status = "Closed - Scrapped", completion_notes = "Asset Scrapped via Kill Switch" WHERE id = ?', [requestId]);
+
+        res.json({ message: 'Asset Scrapped and Request Closed' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { equipmentService } from '../services/api';
+import { equipmentService, api } from '../services/api';
 import { Save, Trash2, Wrench, ArrowLeft } from 'lucide-react';
 
 const EquipmentForm = () => {
@@ -21,7 +21,12 @@ const EquipmentForm = () => {
 
     const [badgeCount, setBadgeCount] = useState(0);
 
+    const [teams, setTeams] = useState([]);
+
     useEffect(() => {
+        // Fetch teams for dropdown
+        api.teams.getAll().then(setTeams).catch(console.error);
+
         if (isEdit) {
             loadData();
         }
@@ -30,18 +35,7 @@ const EquipmentForm = () => {
     const loadData = async () => {
         try {
             const details = await equipmentService.getDetails(id);
-            // Currently details endpoint is filtered, usually we'd fetch full record + extra details
-            // Assuming details endpoint gives us what we need or we have a getById.
-            // Since I only made getDetails return partial info in backend (Team/Tech), 
-            // I should probably rely on a full GET if possible, but let's assume details has mostly merged info or we use getById on backend.
-            // Wait, my backend getDetails returns specific JSON structure.
-            // Let's assume for now I will fetch the main record + Badge.
-
-            // Ideally I should have a generic GET /equipment/:id. 
-            // I'll stick to what I developed: details gives basic info + team names.
-            // Let's refactor slightly to just set what we get.
-
-            setFormData(prev => ({ ...prev, ...details })); // Merge
+            setFormData(prev => ({ ...prev, ...details }));
 
             const badge = await equipmentService.getBadgeCount(id);
             setBadgeCount(badge.open_requests);
@@ -171,6 +165,15 @@ const EquipmentForm = () => {
                             <select name="maintenance_type" value={formData.maintenance_type || 'Preventive'} onChange={handleChange} disabled={isScrapped} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
                                 <option value="Preventive">Preventive (Scheduled)</option>
                                 <option value="Corrective">Corrective (Breakdown)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Primary Response Team</label>
+                            <select name="maintenance_team_id" value={formData.maintenance_team_id || ''} onChange={handleChange} disabled={isScrapped} className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                                <option value="">Select Team...</option>
+                                {teams.map(team => (
+                                    <option key={team.id} value={team.id}>{team.name} ({team.department})</option>
+                                ))}
                             </select>
                         </div>
                     </div>

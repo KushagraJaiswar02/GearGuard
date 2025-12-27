@@ -14,6 +14,12 @@ class MaintenanceRequestModel {
             sql += ' AND e.department = ?';
             params.push(filters.department);
         }
+
+        if (filters.maintenance_team_id) {
+            sql += ' AND e.maintenance_team_id = ?';
+            params.push(filters.maintenance_team_id);
+        }
+
         if (filters.status) {
             sql += ' AND mr.status = ?';
             params.push(filters.status);

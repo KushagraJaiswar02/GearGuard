@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import {
     LayoutDashboard, AlertTriangle, CheckCircle, Trash2, PenTool,
-    ClipboardList, PlusCircle, Users, Activity, Filter, TrendingUp,
-    Package, Clock, ArrowUpRight, ArrowDownRight, RefreshCw
+    ClipboardList, PlusCircle, Users, Activity, TrendingUp,
+    RefreshCw, ArrowUpRight, ArrowDownRight, X
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -19,6 +19,10 @@ const ManagerDashboard = () => {
     const [scrapQueue, setScrapQueue] = useState([]);
     const [feedFilter, setFeedFilter] = useState('All');
     const [isLoading, setIsLoading] = useState(true);
+
+    // Review Modal State
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [selectedRequest, setSelectedRequest] = useState(null);
 
     const loadData = async () => {
         try {
@@ -48,6 +52,23 @@ const ManagerDashboard = () => {
         } catch (e) {
             console.error(e);
             alert('Action failed');
+        }
+    };
+
+    const openReviewModal = (req) => {
+        setSelectedRequest(req);
+        setIsReviewModalOpen(true);
+    };
+
+    const handleKillSwitch = async () => {
+        if (!selectedRequest) return;
+        if (!window.confirm("WARNING: Enable KILL SWITCH?\n\nThis will permanently SCRAP the asset and CLOSE this request.\n\nAre you sure?")) return;
+        try {
+            await api.equipment.scrapKillSwitch(selectedRequest.id);
+            setIsReviewModalOpen(false);
+            loadData();
+        } catch (e) {
+            alert('Kill Switch Failed: ' + e.message);
         }
     };
 
@@ -154,7 +175,7 @@ const ManagerDashboard = () => {
                             </div>
                         </div>
                         <div className="p-4">
-                            <RequestsList filterDept={feedFilter} />
+                            <RequestsList filterDept={feedFilter} onReview={openReviewModal} />
                         </div>
                     </div>
 
@@ -181,11 +202,9 @@ const ManagerDashboard = () => {
                                         </div>
                                         <span className="font-semibold text-gray-700">{team.name}</span>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-sm font-bold">
-                                            {team.in_progress} Jobs
-                                        </span>
-                                    </div>
+                                    <span className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-sm font-bold">
+                                        {team.in_progress} Jobs
+                                    </span>
                                 </div>
                             ))}
                         </div>
@@ -243,7 +262,7 @@ const ManagerDashboard = () => {
                                                     className="py-2.5 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 
                                                              text-white rounded-xl text-xs font-bold transition-all duration-300 hover:shadow-lg"
                                                 >
-                                                    Approve Scrap
+                                                    Approve
                                                 </button>
                                                 <button
                                                     onClick={() => handleScrapAction(item.id, false)}
@@ -260,6 +279,56 @@ const ManagerDashboard = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Review Modal */}
+            {isReviewModalOpen && selectedRequest && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+                        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                <ClipboardList className="w-5 h-5 text-blue-600" />
+                                Request Review
+                            </h2>
+                            <button onClick={() => setIsReviewModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <div className="p-6 space-y-6">
+                            <div className="flex items-start gap-4">
+                                <div className="bg-blue-50 p-3 rounded-lg">
+                                    <Activity className="w-6 h-6 text-blue-600" />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-gray-900">{selectedRequest.equipment_name}</h3>
+                                    <p className="text-sm text-gray-500">SN: {selectedRequest.serial_number}</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                <h4 className="text-xs font-bold text-gray-400 uppercase mb-2">Issue Description</h4>
+                                <p className="text-gray-700 text-sm">{selectedRequest.description}</p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 pt-2">
+                                <button
+                                    onClick={() => setIsReviewModalOpen(false)}
+                                    className="py-3 border border-gray-300 rounded-xl font-bold text-gray-700 hover:bg-gray-50"
+                                >
+                                    Close
+                                </button>
+                                <button
+                                    onClick={handleKillSwitch}
+                                    className="py-3 bg-red-50 border border-red-200 rounded-xl font-bold text-red-600 hover:bg-red-100 flex items-center justify-center gap-2"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                    Kill Switch
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
@@ -269,7 +338,6 @@ const ManagerDashboard = () => {
 const KPICard = ({ label, value, icon: Icon, gradient, subtext, highlight, trend, trendUp }) => (
     <div className={`relative overflow-hidden bg-white p-6 rounded-2xl border transition-all duration-300 hover:shadow-lg hover:-translate-y-1 group
                     ${highlight ? 'border-red-200 ring-2 ring-red-100' : 'border-gray-200'}`}>
-        {/* Background Decoration */}
         <div className={`absolute -right-8 -top-8 w-32 h-32 rounded-full bg-gradient-to-br ${gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
 
         <div className="relative">
@@ -292,7 +360,7 @@ const KPICard = ({ label, value, icon: Icon, gradient, subtext, highlight, trend
     </div>
 );
 
-const RequestsList = ({ filterDept }) => {
+const RequestsList = ({ filterDept, onReview }) => {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -329,8 +397,9 @@ const RequestsList = ({ filterDept }) => {
                 return (
                     <div
                         key={req.id}
-                        className={`p-4 rounded-xl border flex justify-between items-start transition-all duration-300 hover:shadow-sm
-                                  ${isCrit ? 'border-red-200 bg-red-50/50' : 'border-gray-100 hover:bg-gray-50'}`}
+                        onClick={() => onReview(req)}
+                        className={`p-4 rounded-xl border flex justify-between items-start cursor-pointer transition-all duration-300 hover:shadow-sm
+                                  ${isCrit ? 'border-red-200 bg-red-50/50 hover:bg-red-50' : 'border-gray-100 hover:bg-gray-50'}`}
                     >
                         <div className="flex gap-3">
                             <div className={`mt-1.5 w-2.5 h-2.5 rounded-full flex-shrink-0 
