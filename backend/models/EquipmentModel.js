@@ -4,9 +4,8 @@ const db = require('../config/db');
 class EquipmentModel {
     static async getAll(filters = {}) {
         let sql = `
-            SELECT e.*, u.name as technician_name, mt.name as maintenance_team_name 
+            SELECT e.*, mt.name as maintenance_team_name 
             FROM equipment e
-            LEFT JOIN users u ON e.technician_id = u.id
             LEFT JOIN maintenance_teams mt ON e.maintenance_team_id = mt.id
             WHERE 1=1
         `;
@@ -30,10 +29,9 @@ class EquipmentModel {
 
     static async getById(id) {
         const [rows] = await db.query(`
-      SELECT e.*, mt.name as team_name, u.name as technician_name 
+      SELECT e.*, mt.name as team_name
       FROM equipment e
       LEFT JOIN maintenance_teams mt ON e.maintenance_team_id = mt.id
-      LEFT JOIN users u ON e.technician_id = u.id
       WHERE e.id = ?
     `, [id]);
         return rows[0];

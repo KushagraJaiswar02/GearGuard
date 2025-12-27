@@ -14,12 +14,12 @@ const Layout = () => {
                     </h1>
                 </div>
                 <nav className="flex-1 p-4 space-y-2">
-                    <Link to="/" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors">
-                        <Monitor className="w-5 h-5" />
+                    <Link to="/" className="flex items-center gap-3 px-4 py-3 text-white hover:bg-gray-800 rounded-lg transition-colors font-medium">
+                        <Monitor className="w-5 h-5 text-blue-400" />
                         Equipment
                     </Link>
-                    <Link to="/teams" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors">
-                        <Users className="w-5 h-5" />
+                    <Link to="/teams" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 rounded-lg transition-colors font-medium">
+                        <Users className="w-5 h-5 text-gray-400 group-hover:text-blue-400" />
                         Teams
                     </Link>
                 </nav>

@@ -3,11 +3,11 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    multipleStatements: true
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  multipleStatements: true
 });
 
 const sql = `
@@ -44,6 +44,10 @@ CREATE TABLE IF NOT EXISTS equipment (
   employee_id INT,
   maintenance_team_id INT,
   technician_id INT,
+  maintenance_frequency INT DEFAULT 365,
+  maintenance_type VARCHAR(50) DEFAULT 'Preventive',
+  last_service_date DATE,
+  next_service_date DATE,
   status VARCHAR(50) DEFAULT 'Active',
   FOREIGN KEY (employee_id) REFERENCES users(id) ON DELETE SET NULL,
   FOREIGN KEY (maintenance_team_id) REFERENCES maintenance_teams(id) ON DELETE SET NULL,
@@ -60,11 +64,11 @@ CREATE TABLE IF NOT EXISTS maintenance_requests (
 `;
 
 db.connect((err) => {
+  if (err) throw err;
+  console.log('Connected to DB for Schema Init');
+  db.query(sql, (err, result) => {
     if (err) throw err;
-    console.log('Connected to DB for Schema Init');
-    db.query(sql, (err, result) => {
-        if (err) throw err;
-        console.log('Tables created successfully');
-        process.exit();
-    });
+    console.log('Tables created successfully');
+    process.exit();
+  });
 });

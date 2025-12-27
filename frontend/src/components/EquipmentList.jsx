@@ -116,7 +116,7 @@ const EquipmentList = () => {
                 <div className="flex gap-2">
                     <button
                         onClick={() => setShowOverdueOnly(!showOverdueOnly)}
-                        className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors border ${showOverdueOnly ? 'bg-red-100 border-red-200 text-red-700' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                        className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors border font-medium ${showOverdueOnly ? 'bg-red-100 border-red-200 text-red-700' : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'}`}
                     >
                         <AlertTriangle className={`w-5 h-5 ${showOverdueOnly ? 'fill-current' : ''}`} />
                         {showOverdueOnly ? 'Showing Overdue Only' : 'Show Overdue Only'}
@@ -128,21 +128,21 @@ const EquipmentList = () => {
                 </div>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
                 <div className="relative flex-1">
-                    <Search className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
+                    <Search className="absolute left-3 top-2.5 text-gray-500 w-5 h-5" />
                     <input
                         type="text"
                         placeholder="Search by Name or Serial Number..."
-                        className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none transition-all text-gray-800 placeholder-gray-500"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
                 <div className="relative w-64">
-                    <Filter className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
+                    <Filter className="absolute left-3 top-2.5 text-gray-500 w-5 h-5" />
                     <select
-                        className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none appearance-none bg-white"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 outline-none appearance-none bg-white text-gray-800"
                         value={groupBy}
                         onChange={(e) => setGroupBy(e.target.value)}
                     >

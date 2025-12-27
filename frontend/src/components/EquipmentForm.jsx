@@ -93,7 +93,7 @@ const EquipmentForm = () => {
                     </button>
                     <div>
                         <h2 className="text-3xl font-bold text-gray-800">{isEdit ? formData.name : 'New Equipment'}</h2>
-                        <p className="text-gray-500">{isEdit ? `Serial: ${formData.serial_number || 'N/A'}` : 'Enter asset details'}</p>
+                        <p className="text-gray-600 font-medium mt-1">{isEdit ? `Serial: ${formData.serial_number || 'N/A'}` : 'Enter asset details to add to inventory'}</p>
                     </div>
                 </div>
 
