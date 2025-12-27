@@ -41,7 +41,6 @@ const Signup = () => {
         { value: 'User', label: 'Employee', icon: '👤' },
         { value: 'Technician', label: 'Technician', icon: '🔧' },
         { value: 'Manager', label: 'Manager', icon: '👔' },
-        { value: 'Admin', label: 'Admin', icon: '⚡' }
     ];
 
     const departments = [
@@ -160,8 +159,8 @@ const Signup = () => {
                                         type="button"
                                         onClick={() => setFormData({ ...formData, role: role.value })}
                                         className={`py-3 px-2 rounded-xl text-center transition-all duration-300 ${formData.role === role.value
-                                                ? 'bg-gradient-to-br from-purple-500/30 to-pink-500/30 border-purple-500/50 text-white'
-                                                : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:text-white'
+                                            ? 'bg-gradient-to-br from-purple-500/30 to-pink-500/30 border-purple-500/50 text-white'
+                                            : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:text-white'
                                             } border`}
                                     >
                                         <span className="text-lg block mb-1">{role.icon}</span>
@@ -181,8 +180,8 @@ const Signup = () => {
                                         type="button"
                                         onClick={() => setFormData({ ...formData, department: dept.value })}
                                         className={`py-3 px-2 rounded-xl text-center transition-all duration-300 ${formData.department === dept.value
-                                                ? 'bg-gradient-to-br from-blue-500/30 to-cyan-500/30 border-blue-500/50 text-white'
-                                                : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:text-white'
+                                            ? 'bg-gradient-to-br from-blue-500/30 to-cyan-500/30 border-blue-500/50 text-white'
+                                            : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:text-white'
                                             } border`}
                                     >
                                         <span className="text-lg block mb-1">{dept.icon}</span>

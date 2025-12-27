@@ -55,7 +55,10 @@ CREATE TABLE IF NOT EXISTS equipment (
   technician_id INT,
   status VARCHAR(50) DEFAULT 'Active',
   criticality ENUM('Critical', 'Important', 'Normal') DEFAULT 'Normal',
-  last_service_date DATETIME,
+  maintenance_type ENUM('Preventive', 'Corrective') DEFAULT 'Preventive',
+  maintenance_frequency INT DEFAULT 365,
+  last_service_date DATE,
+  next_service_date DATE,
   FOREIGN KEY (employee_id) REFERENCES users(id) ON DELETE SET NULL,
   FOREIGN KEY (maintenance_team_id) REFERENCES maintenance_teams(id) ON DELETE SET NULL,
   FOREIGN KEY (technician_id) REFERENCES users(id) ON DELETE SET NULL
