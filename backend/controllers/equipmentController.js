@@ -58,6 +58,8 @@ exports.createEquipment = async (req, res) => {
         // Sanitize
         if (data.purchase_date === '') data.purchase_date = null;
         if (data.warranty_expiration === '') data.warranty_expiration = null;
+        if (data.technician_id === '') data.technician_id = null;
+        if (data.maintenance_team_id === '') data.maintenance_team_id = null;
         if (data.maintenance_frequency === '') data.maintenance_frequency = 365;
 
         const result = await EquipmentModel.create(data);
