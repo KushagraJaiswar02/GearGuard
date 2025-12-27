@@ -41,7 +41,7 @@ class MaintenanceTeamModel {
 
     static async addMember(teamId, userId) {
         // Prevent duplicate
-        const sql = 'INSERT IGNORE INTO maintenance_team_members (team_id, user_id) VALUES (?, ?)';
+        const sql = 'INSERT INTO maintenance_team_members (team_id, user_id) VALUES (?, ?)';
         await db.query(sql, [teamId, userId]);
         return { teamId, userId };
     }

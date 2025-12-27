@@ -41,10 +41,19 @@ const MaintenanceTeams = () => {
 
     const handleAssignMember = async (teamId, userId, action) => {
         try {
+            console.log(`Assigning: Team ${teamId}, User ${userId}, Action ${action}`);
+            if (isNaN(userId)) {
+                alert('Error: Invalid User ID');
+                return;
+            }
             await api.teams.assignMember(teamId, userId, action);
-            loadData();
+            setTimeout(() => {
+                loadData();
+                alert(`Successfully ${action === 'add' ? 'assigned' : 'removed'} technician.`);
+            }, 300);
         } catch (err) {
-            alert('Failed to update assignment');
+            console.error(err);
+            alert('Failed to update assignment: ' + (err.response?.data?.message || err.message));
         }
     };
 

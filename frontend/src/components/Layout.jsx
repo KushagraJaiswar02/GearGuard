@@ -28,10 +28,12 @@ const Layout = () => {
                         <Monitor className="w-5 h-5" />
                         Equipment
                     </Link>
-                    <Link to="/teams" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors">
-                        <Users className="w-5 h-5" />
-                        Teams
-                    </Link>
+                    {user?.role !== 'User' && (
+                        <Link to="/teams" className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-800 rounded-lg transition-colors">
+                            <Users className="w-5 h-5" />
+                            Teams
+                        </Link>
+                    )}
                 </nav>
 
                 <div className="p-4 border-t border-gray-700">

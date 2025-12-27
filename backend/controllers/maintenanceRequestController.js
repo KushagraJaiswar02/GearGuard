@@ -23,7 +23,9 @@ exports.getAllRequests = async (req, res) => {
             }
         }
 
-        if (req.query.status) filters.status = req.query.status;
+        if (req.query.my_requests === 'true') {
+            filters.reported_by = userId;
+        }
 
         const requests = await MaintenanceRequestModel.getAll(filters);
         res.json(requests);
@@ -51,7 +53,7 @@ exports.createRequest = async (req, res) => {
             description,
             priority: finalPriority,
             status: 'New',
-            // reporter_id: req.user.id // If we had this column
+            reported_by: req.user?.id
         };
 
         const result = await MaintenanceRequestModel.create(newRequest);

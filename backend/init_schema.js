@@ -73,8 +73,10 @@ CREATE TABLE IF NOT EXISTS maintenance_requests (
   completion_notes TEXT,
   completed_at DATETIME,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  reported_by INT,
   FOREIGN KEY (equipment_id) REFERENCES equipment(id) ON DELETE CASCADE,
-  FOREIGN KEY (technician_id) REFERENCES users(id) ON DELETE SET NULL
+  FOREIGN KEY (technician_id) REFERENCES users(id) ON DELETE SET NULL,
+  FOREIGN KEY (reported_by) REFERENCES users(id) ON DELETE SET NULL
 );
 `;
 

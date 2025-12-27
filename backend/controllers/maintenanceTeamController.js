@@ -28,17 +28,23 @@ exports.assignTechnician = async (req, res) => {
         const { id } = req.params; // team id
         const { userId, action } = req.body; // action: 'add' or 'remove'
 
+        console.log(`[DEBUG] Assigning Tech: Team=${id}, User=${userId}, Action=${action}`);
+
         if (action === 'add') {
             // TRANSFER LOGIC: Remove from any other team first
             await db.query('DELETE FROM maintenance_team_members WHERE user_id = ?', [userId]);
             await MaintenanceTeamModel.addMember(id, userId);
+            console.log(`[DEBUG] Added member ${userId} to team ${id}`);
         } else if (action === 'remove') {
             await MaintenanceTeamModel.removeMember(id, userId);
+            console.log(`[DEBUG] Removed member ${userId} from team ${id}`);
         } else {
+            console.log('[DEBUG] Invalid action:', action);
             return res.status(400).json({ message: 'Invalid action. Use add or remove.' });
         }
         res.json({ message: 'Team updated successfully' });
     } catch (err) {
+        console.error('[DEBUG] Assign Error:', err);
         res.status(500).json({ error: err.message });
     }
 };
@@ -61,16 +67,19 @@ exports.getTechnicians = async (req, res) => {
 exports.getUserTeam = async (req, res) => {
     try {
         const { id } = req.user;
+        console.log(`[DEBUG] getUserTeam for userId: ${id}`);
         const [rows] = await db.query(`
             SELECT t.* 
             FROM maintenance_teams t
             JOIN maintenance_team_members mtm ON t.id = mtm.team_id
             WHERE mtm.user_id = ?
         `, [id]);
+        console.log(`[DEBUG] getUserTeam result:`, rows);
 
         if (rows.length === 0) return res.json(null); // No team
         res.json(rows[0]);
     } catch (err) {
+        console.error('[DEBUG] getUserTeam error:', err);
         res.status(500).json({ error: err.message });
     }
 };

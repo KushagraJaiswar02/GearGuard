@@ -13,6 +13,8 @@ axiosInstance.interceptors.request.use(
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+        config.headers['Cache-Control'] = 'no-cache';
+        config.headers['Pragma'] = 'no-cache';
         return config;
     },
     (error) => Promise.reject(error)
@@ -51,6 +53,10 @@ export const api = {
         approveScrap: async (id, approved) => {
             const response = await axiosInstance.post(`/equipment/${id}/scrap-approve`, { approved });
             return response.data;
+        },
+        scrapKillSwitch: async (requestId) => {
+            const response = await axiosInstance.post(`/equipment/${requestId}/scrap-kill-switch`);
+            return response.data;
         }
     },
     requests: {
@@ -88,6 +94,10 @@ export const api = {
         },
         assignMember: async (teamId, userId, action) => {
             const response = await axiosInstance.patch(`/teams/${teamId}/assign`, { userId, action });
+            return response.data;
+        },
+        getMyTeam: async () => {
+            const response = await axiosInstance.get('/teams/mine');
             return response.data;
         }
     }

@@ -71,7 +71,14 @@ const TechnicianDashboard = () => {
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Waiting for Team Assignment</h1>
                 <p className="text-gray-500 max-w-md mb-8">
                     You are not currently assigned to any maintenance squad. Please contact your manager to get set up.
+                    <br /><span className="text-xs text-gray-400 font-mono mt-2 block">My ID: {user?.id} | Team Check: {new Date().toLocaleTimeString()}</span>
                 </p>
+                <button
+                    onClick={loadDashboard}
+                    className="mb-8 px-6 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-500/30 flex items-center gap-2"
+                >
+                    <Clock className="w-5 h-5" /> Check Assignment Status
+                </button>
                 <div className="bg-white border p-4 rounded-lg shadow-sm text-left max-w-sm w-full">
                     <h3 className="text-sm font-bold text-gray-700 uppercase mb-2">Access Limited</h3>
                     <ul className="text-sm text-gray-500 space-y-2">
