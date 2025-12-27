@@ -1,0 +1,6 @@
+-- Reset ROOT and create gear_dev
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'GearGuard2025!';
+CREATE USER IF NOT EXISTS 'gear_dev'@'localhost' IDENTIFIED WITH mysql_native_password BY 'GearGuard2025!';
+ALTER USER 'gear_dev'@'localhost' IDENTIFIED WITH mysql_native_password BY 'GearGuard2025!';
+GRANT ALL PRIVILEGES ON *.* TO 'gear_dev'@'localhost' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
