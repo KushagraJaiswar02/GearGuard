@@ -84,6 +84,10 @@ A comprehensive Maintenance Management System built with a React frontend and No
 - **Team Management:** Organize technicians into specialized teams.
 - **Fault Reporting:** Easy-to-use modal for reporting equipment issues.
 
+
+![ER Diagram](assets/ERdiagram.png)
+
+
 ## Debugging
 
 If you encounter issues during setup:
