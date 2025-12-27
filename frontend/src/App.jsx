@@ -1,19 +1,24 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
-import Dashboard from './pages/Dashboard';
+import EquipmentList from './components/EquipmentList';
+import EquipmentForm from './components/EquipmentForm';
+import MaintenanceTeams from './components/MaintenanceTeams';
+import './index.css';
 
 function App() {
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          {/* Add more routes as needed */}
-          <Route path="*" element={<div className="text-center mt-20 text-muted-foreground">Not Implemented</div>} />
-        </Routes>
-      </Layout>
-    </Router>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<EquipmentList />} />
+          <Route path="equipment/new" element={<EquipmentForm />} />
+          <Route path="equipment/:id" element={<EquipmentForm />} />
+          <Route path="teams" element={<MaintenanceTeams />} />
+          <Route path="maintenance/kanban" element={<div className="p-8"><h1>Maintenance Kanban (Placeholder)</h1></div>} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
