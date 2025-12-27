@@ -21,7 +21,6 @@ connection.connect((err) => {
             process.exit(1);
         }
         console.log(`Database '${process.env.DB_NAME}' created or checks out.`);
-
         connection.changeUser({ database: process.env.DB_NAME }, (err) => {
             if (err) {
                 console.error('CHANGE USER ERROR:', err.message);
@@ -45,7 +44,7 @@ connection.connect((err) => {
                     process.exit(1);
                 }
                 console.log('Table "users" created or checks out.');
-                
+
                 // Optional: Create a default admin user if table is empty? 
                 // Let's stick to basic creation for now.
                 process.exit(0);

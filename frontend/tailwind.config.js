@@ -4,7 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: "class",
+  darkMode: 'class', // Enable class-based dark mode
   theme: {
     extend: {
       colors: {
@@ -41,6 +41,12 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        // Supabase specificish tones
+        sidebar: {
+          DEFAULT: '#1c1c1c',
+          foreground: '#ededed',
+          active: '#2e2e2e',
+        }
       },
       borderRadius: {
         lg: "var(--radius)",

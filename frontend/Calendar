@@ -1,0 +1,11 @@
+// Logic to format for a Calendar library (e.g. FullCalendar)
+const formatForCalendar = (data) => {
+  return data
+    .filter(item => item.isPreventive)
+    .map(item => ({
+      title: item.description,
+      start: item.startTime,
+      end: item.endTime,
+      extendedProps: { duration: item.durationMinutes }
+    }));
+};
