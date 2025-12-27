@@ -21,6 +21,7 @@ app.use(express.json());
 app.use((req, res, next) => {
     console.log(`[DEBUG] Request received: ${req.method} ${req.url}`);
     next();
+});
 const maintenanceRoutes = require('./maintenance/request.routes');
 app.use('/api/maintenance', maintenanceRoutes);
 
@@ -42,9 +43,16 @@ const userRoutes = require('./routes/userRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+const equipmentRoutes = require('./routes/equipmentRoutes');
+app.use('/api/equipment', equipmentRoutes);
 
-const PORT = process.env.PORT || 5000;
+// Export for testing
+module.exports = app;
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+// Only listen if this file is run directly (not imported by tests)
+if (require.main === module) {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
